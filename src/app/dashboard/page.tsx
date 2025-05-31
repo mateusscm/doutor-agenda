@@ -1,7 +1,30 @@
-import React from "react";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-const DashboardPage: React.FC = () => {
-  return <span>Dashboard</span>;
+import { auth } from "@/lib/auth";
+
+import SignOutButton from "./components/sign-out-button";
+
+const DashboardPage = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/authentication");
+  }
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <h2>
+        {session?.user?.name
+          ? `Bem-vindo, ${session.user.name}!`
+          : "Você não está logado."}
+      </h2>
+      <SignOutButton />
+    </div>
+  );
 };
 
 export default DashboardPage;
