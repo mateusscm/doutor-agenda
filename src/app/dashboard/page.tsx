@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { db } from "@/db";
@@ -16,6 +17,8 @@ const DashboardPage = async () => {
   if (!session) {
     redirect("/authentication");
   }
+
+  console.log("Session:", session);
 
   // Preciso pegar as clinicas do usuario logado
   const clinics = await db.query.usersToClinicsTable.findMany({
@@ -34,6 +37,12 @@ const DashboardPage = async () => {
           ? `Bem-vindo, ${session.user.name}!`
           : "Você não está logado."}
       </h2>
+      <Image
+        src={session?.user?.image as string}
+        alt="User Avatar"
+        width={100}
+        height={100}
+      />
       <SignOutButton />
     </div>
   );

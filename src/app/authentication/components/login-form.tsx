@@ -46,7 +46,7 @@ const LoginForm: React.FC = () => {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof loginSchema>) {
+  const handleNormalSubmit = async (values: z.infer<typeof loginSchema>) => {
     await authClient.signIn.email(
       {
         email: values.email,
@@ -61,12 +61,22 @@ const LoginForm: React.FC = () => {
         },
       },
     );
-  }
+  };
+
+  const handleGoogleLogin = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/dashboard",
+    });
+  };
 
   return (
     <Card>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(handleNormalSubmit)}
+          className="space-y-8"
+        >
           <CardHeader>
             <CardTitle>Login</CardTitle>
             <CardDescription>
@@ -110,17 +120,27 @@ const LoginForm: React.FC = () => {
             />
           </CardContent>
           <CardFooter>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                "Entrar"
-              )}
-            </Button>
+            <div className="grid w-full space-y-2">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  "Entrar"
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                className="mt-4 w-full"
+                onClick={handleGoogleLogin}
+                type="button"
+              >
+                Entrar com Google
+              </Button>
+            </div>
           </CardFooter>
         </form>
       </Form>
