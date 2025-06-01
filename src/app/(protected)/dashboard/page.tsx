@@ -7,7 +7,7 @@ import { db } from "@/db";
 import { usersToClinicsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
-import SignOutButton from "./components/sign-out-button";
+import SignOutButton from "./_components/sign-out-button";
 
 const DashboardPage = async () => {
   const session = await auth.api.getSession({
@@ -17,8 +17,6 @@ const DashboardPage = async () => {
   if (!session) {
     redirect("/authentication");
   }
-
-  console.log("Session:", session);
 
   // Preciso pegar as clinicas do usuario logado
   const clinics = await db.query.usersToClinicsTable.findMany({
