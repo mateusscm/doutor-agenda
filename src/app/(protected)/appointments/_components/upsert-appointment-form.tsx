@@ -131,6 +131,22 @@ const UpsertAppointmentForm = ({
     },
   });
 
+  const isDateAvailable = (date: Date) => {
+    if (!selectedDoctorId) return false;
+
+    const selectedDoctor = doctors.find(
+      (doctor) => doctor.id === selectedDoctorId,
+    );
+
+    if (!selectedDoctor) return false;
+
+    const dayOfWeek = date.getDay();
+    return (
+      dayOfWeek >= selectedDoctor.availableFromWeekDay &&
+      dayOfWeek <= selectedDoctor.availableToWeekDay
+    );
+  };
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     createAppointmentAction.execute({
       ...values,
@@ -260,7 +276,9 @@ const UpsertAppointmentForm = ({
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) => date < new Date()}
+                      disabled={(date) =>
+                        date < new Date() || !isDateAvailable(date)
+                      }
                       initialFocus
                       locale={ptBR}
                     />
