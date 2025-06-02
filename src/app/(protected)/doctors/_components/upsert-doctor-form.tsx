@@ -83,6 +83,7 @@ const UpsertDoctorForm = ({ onSuccess }: UpsertDoctorFormProps) => {
     onSuccess: () => {
       toast.success("Médico adicionado com sucesso!");
       onSuccess?.();
+      form.reset();
     },
     onError: () => {
       toast.error(`Erro ao adicionar médico`);
