@@ -16,7 +16,7 @@ const TableActions = ({ patient }: TableActionsProps) => {
 
   return (
     <Dialog open={isOpenEdit} onOpenChange={setIsOpenEdit}>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild className="flex">
         <Button variant="outline" size="sm" className="ml-auto">
           <Edit className="h-4 w-4" />
         </Button>
