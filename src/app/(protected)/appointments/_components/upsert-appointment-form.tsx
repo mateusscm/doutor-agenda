@@ -11,7 +11,7 @@ import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { upsertAppointment } from "@/actions/upsert-appointment";
+import { createAppointment } from "@/actions/create-appointment";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -46,15 +46,21 @@ import { doctorsTable, patientsTable } from "@/db/schema";
 import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
-  patientId: z.string().min(1, "Selecione um paciente"),
-  doctorId: z.string().min(1, "Selecione um médico"),
+  patientId: z.string().min(1, {
+    message: "Paciente é obrigatório.",
+  }),
+  doctorId: z.string().min(1, {
+    message: "Médico é obrigatório.",
+  }),
   appointmentPrice: z.number().min(1, {
     message: "Valor da consulta é obrigatório.",
   }),
   date: z.date({
-    required_error: "Selecione uma data",
+    message: "Data é obrigatória.",
   }),
-  time: z.string().optional(), // Será implementado futuramente
+  time: z.string().min(1, {
+    message: "Horário é obrigatório.",
+  }),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -102,7 +108,7 @@ const UpsertAppointmentForm = ({
     }
   }, [selectedDoctorId, doctors, form]);
 
-  const createAppointmentAction = useAction(upsertAppointment, {
+  const createAppointmentAction = useAction(createAppointment, {
     onSuccess: () => {
       toast.success("Agendamento criado com sucesso.");
       onSuccess?.();

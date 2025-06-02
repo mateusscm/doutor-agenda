@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import React from "react";
 
+import { DataTable } from "@/components/ui/data-table";
 import {
   PageActions,
   PageContainer,
@@ -13,10 +14,11 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import { db } from "@/db";
-import { doctorsTable, patientsTable } from "@/db/schema";
+import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 import AddAppointmentButton from "./_components/add-appointment-button";
+import { appointmentsTableColumns } from "./_components/table-columns";
 
 const Appointments = async () => {
   const session = await auth.api.getSession({
@@ -40,6 +42,15 @@ const Appointments = async () => {
     }),
   ]);
 
+  const appointments = await db.query.appointmentsTable.findMany({
+    where: eq(appointmentsTable.clinicId, session.user.clinic.id),
+    with: {
+      patient: true,
+      doctor: true,
+    },
+    orderBy: (appointments, { desc }) => [desc(appointments.date)],
+  });
+
   return (
     <PageContainer>
       <PageHeader>
@@ -54,12 +65,7 @@ const Appointments = async () => {
         </PageActions>
       </PageHeader>
       <PageContent>
-        {/* Conteúdo da listagem de agendamentos será implementado futuramente */}
-        <div className="flex h-64 items-center justify-center">
-          <p className="text-muted-foreground">
-            Listagem de agendamentos em desenvolvimento
-          </p>
-        </div>
+        <DataTable columns={appointmentsTableColumns} data={appointments} />
       </PageContent>
     </PageContainer>
   );
