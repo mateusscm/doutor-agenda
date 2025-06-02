@@ -1,10 +1,10 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Edit } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { patientsTable } from "@/db/schema";
+
+import TableActions from "./table-actions";
 
 type Patient = typeof patientsTable.$inferSelect;
 
@@ -44,10 +44,6 @@ export const patientsTableColumns: ColumnDef<Patient>[] = [
   },
   {
     id: "actions",
-    cell: () => (
-      <Button variant="ghost" size="icon">
-        <Edit className="h-4 w-4" />
-      </Button>
-    ),
+    cell: (params) => <TableActions patient={params.row.original} />,
   },
 ];
