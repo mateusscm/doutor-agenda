@@ -52,11 +52,6 @@ const Patients = async () => {
       </PageHeader>
       <PageContent>
         <DataTable columns={patientsTableColumns} data={patients} />
-        {/* <div className="grid grid-cols-3 gap-6">
-          {patients.map((patient) => (
-            <PatientCard key={patient.id} patient={patient} />
-          ))}
-        </div> */}
       </PageContent>
     </PageContainer>
   );
