@@ -58,6 +58,7 @@ export const createAppointment = actionClient
     });
 
     revalidatePath("/appointments");
+    revalidatePath("/dashboard");
 
     return {
       message: "Agendamento criado com sucesso!",
