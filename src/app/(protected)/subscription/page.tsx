@@ -24,6 +24,9 @@ const SubscriptionPage = async () => {
   if (!session.user.clinic) {
     redirect("/clinic-form");
   }
+  if (!session.user.plan) {
+    redirect("/new-subscription");
+  }
 
   return (
     <PageContainer>
