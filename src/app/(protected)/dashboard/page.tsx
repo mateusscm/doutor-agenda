@@ -1,5 +1,4 @@
 import dayjs from "dayjs";
-import { and, count, eq, gte, lte, sum } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -12,10 +11,10 @@ import {
   PageHeaderContent,
   PageTitle,
 } from "@/components/ui/page-container";
-import { db } from "@/db";
-import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
+import { getDashboard } from "@/data/get-dashboard";
 import { auth } from "@/lib/auth";
 
+import AppointmentsChart from "./_components/appointments-chart";
 import { DatePicker } from "./_components/date-picker";
 import StatsCards from "./_components/stats-cards";
 
@@ -45,45 +44,27 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
       `/dashboard?from=${dayjs().format("YYYY-MM-DD")}&to=${dayjs().add(1, "month").format("YYYY-MM-DD")}`,
     );
   }
-  const [totalRevenue, totalAppointments, totalPatients, totalDoctors] =
-    await Promise.all([
-      db
-        .select({
-          total: sum(appointmentsTable.appointmentPriceInCents),
-        })
-        .from(appointmentsTable)
-        .where(
-          and(
-            eq(appointmentsTable.clinicId, session.user.clinic.id),
-            gte(appointmentsTable.date, new Date(from)),
-            lte(appointmentsTable.date, new Date(to)),
-          ),
-        ),
-      db
-        .select({
-          total: count(),
-        })
-        .from(appointmentsTable)
-        .where(
-          and(
-            eq(appointmentsTable.clinicId, session.user.clinic.id),
-            gte(appointmentsTable.date, new Date(from)),
-            lte(appointmentsTable.date, new Date(to)),
-          ),
-        ),
-      db
-        .select({
-          total: count(),
-        })
-        .from(patientsTable)
-        .where(eq(patientsTable.clinicId, session.user.clinic.id)),
-      db
-        .select({
-          total: count(),
-        })
-        .from(doctorsTable)
-        .where(eq(doctorsTable.clinicId, session.user.clinic.id)),
-    ]);
+
+  const {
+    totalRevenue,
+    totalAppointments,
+    totalPatients,
+    totalDoctors,
+    // topDoctors,
+    // topSpecialties,
+    // todayAppointments,
+    dailyAppointmentsData,
+  } = await getDashboard({
+    from,
+    to,
+    session: {
+      user: {
+        clinic: {
+          id: session.user.clinic.id,
+        },
+      },
+    },
+  });
 
   return (
     <PageContainer>
@@ -100,13 +81,14 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
       </PageHeader>
       <PageContent>
         <StatsCards
-          totalRevenue={
-            totalRevenue[0]?.total ? Number(totalRevenue[0]?.total) : null
-          }
-          totalAppointments={totalAppointments[0]?.total || 0}
-          totalPatients={totalPatients[0]?.total || 0}
-          totalDoctors={totalDoctors[0]?.total || 0}
+          totalRevenue={totalRevenue.total ? Number(totalRevenue.total) : null}
+          totalAppointments={totalAppointments.total}
+          totalPatients={totalPatients.total}
+          totalDoctors={totalDoctors.total}
         />
+        <div className="grid grid-cols-[2.25fr_1fr] gap-4">
+          <AppointmentsChart dailyAppointmentsData={dailyAppointmentsData} />
+        </div>
       </PageContent>
     </PageContainer>
   );
